@@ -103,7 +103,7 @@ namespace PFE_PROJECT.Controllers
 
         // GET: api/Marque/CanDelete/5
         [HttpGet("CanDelete/{id}")]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+        //[Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<ActionResult<bool>> CanDeleteMarque(int id)
         {
             var canDelete = await _marqueService.CanDeleteMarqueAsync(id);

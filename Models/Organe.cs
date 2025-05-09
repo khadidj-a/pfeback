@@ -9,7 +9,7 @@ public class Organe
 
     public string code_organe { get; set; } = string.Empty;
     public string libelle_organe { get; set; } = string.Empty;
-    public string modèle { get; set; } = string.Empty;
+    public string modele { get; set; } = string.Empty;
 
     [ForeignKey("Marque")]
     public int id_marque { get; set; }

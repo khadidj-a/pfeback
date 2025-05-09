@@ -18,40 +18,37 @@ namespace PFE_PROJECT.Services
         }
 
         public async Task<IEnumerable<CategorieDTO>> GetAllCategoriesAsync(string? searchTerm = null, string? sortBy = null, bool ascending = true)
-{
-    var query = _context.Categories.AsQueryable();
+        {
+            var query = _context.Categories.AsQueryable();
 
-    // Filtrage (Recherche)
-    if (!string.IsNullOrEmpty(searchTerm))
-    {var lowerSearch = searchTerm.ToLower();
-        query = query.Where(c => 
-            c.categorie_principale.Contains(searchTerm) || 
-            (c.codecategorie != null && c.codecategorie.Contains(searchTerm)) ||
-            c.designation.Contains(searchTerm));
-    }
+            // Filtrage (Recherche)
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                var lowerSearch = searchTerm.ToLower();
+                query = query.Where(c => 
+                    (c.codecategorie != null && c.codecategorie.Contains(searchTerm)) ||
+                    c.designation.Contains(searchTerm));
+            }
 
-    // Tri (Défaut : idcategorie)
-    sortBy ??= "idcategorie";
+            // Tri (Défaut : idcategorie)
+            sortBy ??= "idcategorie";
 
-    query = sortBy.ToLower() switch
-    {
-        "categorie_principale" => ascending ? query.OrderBy(c => c.categorie_principale) : query.OrderByDescending(c => c.categorie_principale),
-        "codecategorie" => ascending ? query.OrderBy(c => c.codecategorie) : query.OrderByDescending(c => c.codecategorie),
-        "designation" => ascending ? query.OrderBy(c => c.designation) : query.OrderByDescending(c => c.designation),
-        _ => ascending ? query.OrderBy(c => c.idcategorie) : query.OrderByDescending(c => c.idcategorie)
-    };
+            query = sortBy.ToLower() switch
+            {
+                "codecategorie" => ascending ? query.OrderBy(c => c.codecategorie) : query.OrderByDescending(c => c.codecategorie),
+                "designation" => ascending ? query.OrderBy(c => c.designation) : query.OrderByDescending(c => c.designation),
+                _ => ascending ? query.OrderBy(c => c.idcategorie) : query.OrderByDescending(c => c.idcategorie)
+            };
 
-    var categories = await query.ToListAsync();
+            var categories = await query.ToListAsync();
 
-    return categories.Select(c => new CategorieDTO
-    {
-        idcategorie = c.idcategorie,
-        categorie_principale = c.categorie_principale,
-        codecategorie = c.codecategorie ?? "",
-        designation = c.designation
-    });
-}
-
+            return categories.Select(c => new CategorieDTO
+            {
+                idcategorie = c.idcategorie,
+                codecategorie = c.codecategorie,
+                designation = c.designation
+            });
+        }
 
         public async Task<CategorieDTO?> GetCategorieByIdAsync(int id)
         {
@@ -61,8 +58,7 @@ namespace PFE_PROJECT.Services
             return new CategorieDTO
             {
                 idcategorie = categorie.idcategorie,
-                categorie_principale = categorie.categorie_principale,
-                codecategorie = categorie.codecategorie ?? "",
+                codecategorie = categorie.codecategorie,
                 designation = categorie.designation
             };
         }
@@ -71,7 +67,6 @@ namespace PFE_PROJECT.Services
         {
             var categorie = new Categorie
             {
-                categorie_principale = categorieDto.categorie_principale,
                 designation = categorieDto.designation
             };
 
@@ -81,8 +76,7 @@ namespace PFE_PROJECT.Services
             return new CategorieDTO
             {
                 idcategorie = categorie.idcategorie,
-                categorie_principale = categorie.categorie_principale,
-                codecategorie = categorie.codecategorie ?? "",
+                codecategorie = categorie.codecategorie,
                 designation = categorie.designation
             };
         }
@@ -98,8 +92,7 @@ namespace PFE_PROJECT.Services
             return new CategorieDTO
             {
                 idcategorie = categorie.idcategorie,
-                categorie_principale = categorie.categorie_principale,
-                codecategorie = categorie.codecategorie ?? "",
+                codecategorie = categorie.codecategorie,
                 designation = categorie.designation
             };
         }

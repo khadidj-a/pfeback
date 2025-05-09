@@ -26,11 +26,11 @@ public async Task<IEnumerable<OrganeDTO>> GetAllAsync(
     // 🔍 Filtrage par mot-clé
     if (!string.IsNullOrEmpty(searchTerm))
     {
-        string lowerSearch = searchTerm.ToLower();
-        query = query.Where(o =>
-            o.libelle_organe.ToLower().Contains(lowerSearch) ||
+        var lowerSearch = searchTerm.ToLower();
+        query = query.Where(o => 
             o.code_organe.ToLower().Contains(lowerSearch) ||
-            o.modèle.ToLower().Contains(lowerSearch) ||
+            o.libelle_organe.ToLower().Contains(lowerSearch) ||
+            o.modele.ToLower().Contains(lowerSearch) ||
             o.Marque.nom_fabriquant.ToLower().Contains(lowerSearch));
     }
 
@@ -42,7 +42,7 @@ public async Task<IEnumerable<OrganeDTO>> GetAllAsync(
     {
         "libelle_organe" => ascending ? query.OrderBy(o => o.libelle_organe) : query.OrderByDescending(o => o.libelle_organe),
         "code_organe" => ascending ? query.OrderBy(o => o.code_organe) : query.OrderByDescending(o => o.code_organe),
-        "modèle" => ascending ? query.OrderBy(o => o.modèle) : query.OrderByDescending(o => o.modèle),
+        "modele" => ascending ? query.OrderBy(o => o.modele) : query.OrderByDescending(o => o.modele),
         "nom_marque" => ascending ? query.OrderBy(o => o.Marque.nom_fabriquant) : query.OrderByDescending(o => o.Marque.nom_fabriquant),
         _ => ascending ? query.OrderBy(o => o.id_organe) : query.OrderByDescending(o => o.id_organe)
     };
@@ -53,7 +53,7 @@ public async Task<IEnumerable<OrganeDTO>> GetAllAsync(
         id_organe = o.id_organe,
         code_organe = o.code_organe,
         libelle_organe = o.libelle_organe,
-        modèle = o.modèle,
+        modele = o.modele,
         id_marque = o.id_marque,
         nom_marque = o.Marque.nom_fabriquant,
         caracteristiques = o.OrganeCaracteristiques
@@ -82,7 +82,7 @@ public async Task<IEnumerable<OrganeDTO>> GetAllAsync(
                 id_organe = o.id_organe,
                 code_organe = o.code_organe,
                 libelle_organe = o.libelle_organe,
-                modèle = o.modèle,
+                modele = o.modele,
                 id_marque = o.id_marque,
                 nom_marque = o.Marque.nom_fabriquant,
                 caracteristiques = o.OrganeCaracteristiques
@@ -105,7 +105,7 @@ public async Task<IEnumerable<OrganeDTO>> GetAllAsync(
             {
                 code_organe = newCode, // auto-généré ici
                 libelle_organe = dto.libelle_organe,
-                modèle = dto.modèle,
+                modele = dto.modele,
                 id_marque = dto.id_marque,
                 OrganeCaracteristiques = dto.caracteristiques.Select(c => new OrganeCaracteristique
                 {
@@ -133,7 +133,7 @@ public async Task<IEnumerable<OrganeDTO>> GetAllAsync(
                 id_organe = organe.id_organe,
                 code_organe = organe.code_organe,
                 libelle_organe = organe.libelle_organe,
-                modèle = organe.modèle,
+                modele = organe.modele,
                 id_marque = organe.id_marque,
                 nom_marque = organe.Marque.nom_fabriquant,
                 caracteristiques = organe.OrganeCaracteristiques
@@ -156,7 +156,7 @@ public async Task<IEnumerable<OrganeDTO>> GetAllAsync(
             if (o == null) return null;
 
             o.libelle_organe = dto.libelle_organe;
-            o.modèle = dto.modèle;
+            o.modele = dto.modele;
             o.id_marque = dto.id_marque;
 
             // Suppression des anciennes relations

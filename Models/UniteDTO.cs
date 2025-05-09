@@ -14,6 +14,7 @@ namespace PFE_PROJECT.Models
     public class CreateUniteDTO
     {
         public string designation { get; set; } = string.Empty;
+        public string codeunite { get; set; } = string.Empty;
         public int idwilaya { get; set; }
         public int idregion { get; set; }
     }
@@ -21,7 +22,9 @@ namespace PFE_PROJECT.Models
     public class UpdateUniteDTO
     {
         public string designation { get; set; } = string.Empty;
+        public string codeunite { get; set; } = string.Empty;
         public int idwilaya { get; set; }
         public int idregion { get; set; }
     }
 }
+

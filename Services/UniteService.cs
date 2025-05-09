@@ -35,7 +35,7 @@ namespace PFE_PROJECT.Services
     }
 
     // 🧭 Tri
-    sortBy ??= "idunite";
+    sortBy ??= "codeunite";
     query = sortBy.ToLower() switch
     {
         "designation" => ascending ? query.OrderBy(u => u.designation) : query.OrderByDescending(u => u.designation),
@@ -47,15 +47,16 @@ namespace PFE_PROJECT.Services
 
     // 🟢 Projection vers DTO
     var result = await query.Select(u => new UniteDTO
-    {
-        idunite = u.idunite,
-        codeunite = u.codeunite ?? "",
-        designation = u.designation,
-        idwilaya = u.idwilaya,
-        nomwilaya = u.Wilaya.nomwilaya,
-        idregion = u.idregion,
-        nomregion = u.Region.nomregion
-    }).ToListAsync();
+{
+    idunite = u.idunite,
+    codeunite = u.codeunite ?? "",
+    designation = u.designation,
+    idwilaya = u.idwilaya,
+    nomwilaya = u.Wilaya.nomwilaya,
+    idregion = u.idregion,
+    nomregion = u.Region.nomregion
+}).ToListAsync();
+
 
     return result;
 }
@@ -83,11 +84,13 @@ namespace PFE_PROJECT.Services
         public async Task<UniteDTO> CreateUniteAsync(CreateUniteDTO dto)
         {
             var unite = new Unite
-            {
-                designation = dto.designation,
-                idwilaya = dto.idwilaya,
-                idregion = dto.idregion
-            };
+        {
+            codeunite = dto.codeunite, 
+            designation = dto.designation,
+            idwilaya = dto.idwilaya,
+            idregion = dto.idregion
+       };
+
 
             _context.Unites.Add(unite);
             await _context.SaveChangesAsync();
@@ -101,9 +104,11 @@ namespace PFE_PROJECT.Services
             var unite = await _context.Unites.FindAsync(id);
             if (unite == null) return null;
 
+            unite.codeunite = dto.codeunite;
             unite.designation = dto.designation;
             unite.idwilaya = dto.idwilaya;
             unite.idregion = dto.idregion;
+
 
             await _context.SaveChangesAsync();
             await _context.Entry(unite).ReloadAsync();
@@ -112,10 +117,10 @@ namespace PFE_PROJECT.Services
         }
 
         public async Task<bool> CanDeleteUniteAsync(int id)
-{
-    // On vérifie dans la table des affectations s'il y a un équipement affecté à cette unité
-    return !await _context.Affectations.AnyAsync(a => a.idunite == id);
-}
+        {
+            // On vérifie dans la table des affectations s'il y a un équipement affecté à cette unité
+            return !await _context.Affectations.AnyAsync(a => a.idunite == id);
+        }
 
 
         public async Task<bool> DeleteUniteAsync(int id)
@@ -129,6 +134,11 @@ namespace PFE_PROJECT.Services
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<int> GetUniteCountAsync()
+{
+    return await _context.Unites.CountAsync();
+}
+
 
         public async Task<IEnumerable<Wilaya>> GetAllWilayasAsync() => await _context.Wilayas.ToListAsync();
         public async Task<IEnumerable<Region>> GetAllRegionsAsync() => await _context.Regions.ToListAsync();

@@ -13,6 +13,5 @@ namespace PFE_PROJECT.Services
         Task<EquipementDTO?> UpdateAsync(int id, UpdateEquipementDTO dto);
         Task<bool> DeleteAsync(int id);
         Task<bool> ValidateEtatAsync(string? état);
-        Task<bool> ValidateCategorieAsync(string? categorie);
     }
 } 

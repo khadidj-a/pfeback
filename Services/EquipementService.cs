@@ -262,6 +262,12 @@ namespace PFE_PROJECT.Services
             var equipement = await _context.Equipements.FindAsync(id);
             if (equipement == null) return null;
 
+            // Check if equipment is in a restricted state
+            if (equipement.état == "Réformé" || equipement.état == "Prêt")
+            {
+                throw new InvalidOperationException($"Impossible de modifier un équipement en état '{equipement.état}'");
+            }
+
             // Validate état
             if (!await ValidateEtatAsync(dto.état))
                 throw new ArgumentException("État invalide");
@@ -303,14 +309,6 @@ namespace PFE_PROJECT.Services
             
             var validEtats = new[] { "Prêt", "En stock", "Réformé", "En panne", "En Service" };
             return validEtats.Contains(état);
-        }
-
-        public async Task<bool> ValidateCategorieAsync(string? categorie)
-        {
-            if (string.IsNullOrEmpty(categorie)) return true;
-            
-            var validCategories = new[] { "Soutien", "Fixes", "Roulants" };
-            return validCategories.Contains(categorie);
         }
     }
 } 

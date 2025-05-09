@@ -79,12 +79,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // ➕ CORS : autoriser toutes les origines (ajuste si besoin)
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+    options.AddPolicy("AllowAll",
+        builder =>
+        {
+            builder.SetIsOriginAllowed(origin => true) // Allow any origin
+                   .AllowAnyMethod()
+                   .AllowAnyHeader()
+                   .AllowCredentials();
+        });
 });
 
 // ➕ Repositories & Services - Utilisateur / Rôles
@@ -110,6 +112,7 @@ builder.Services.AddScoped<ICaracteristiqueEquipementService, CaracteristiqueEqu
 builder.Services.AddScoped<IOrganeEquipementService, OrganeEquipementService>();
 builder.Services.AddScoped<IGroupeOrganeService, GroupeOrganeService>();
 builder.Services.AddScoped<IGroupeCaracteristiqueService, GroupeCaracteristiqueService>();
+builder.Services.AddScoped<IAffectationService, AffectationService>();
 
 var app = builder.Build();
 

@@ -12,6 +12,8 @@ namespace PFE_PROJECT.Services
         Task<UniteDTO?> UpdateUniteAsync(int id, UpdateUniteDTO uniteDto);
         Task<bool> CanDeleteUniteAsync(int id);
         Task<bool> DeleteUniteAsync(int id);
+        Task<int> GetUniteCountAsync();
+
         Task<IEnumerable<Wilaya>> GetAllWilayasAsync();
         Task<IEnumerable<Region>> GetAllRegionsAsync();
     }

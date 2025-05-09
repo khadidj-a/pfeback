@@ -21,7 +21,7 @@ namespace PFE_PROJECT.Controllers
 
         // GET: api/Unite
         [HttpGet]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+      // [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<ActionResult<IEnumerable<UniteDTO>>> GetUnites(
             [FromQuery] string? searchTerm = null,
             [FromQuery] string? sortBy = null,
@@ -33,7 +33,7 @@ namespace PFE_PROJECT.Controllers
 
         // GET: api/Unite/5
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<ActionResult<UniteDTO>> GetUnite(int id)
         {
             var unite = await _uniteService.GetUniteByIdAsync(id);
@@ -43,7 +43,7 @@ namespace PFE_PROJECT.Controllers
 
         // POST: api/Unite
         [HttpPost]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<ActionResult<UniteDTO>> CreateUnite(CreateUniteDTO dto)
         {
             var created = await _uniteService.CreateUniteAsync(dto);
@@ -52,7 +52,7 @@ namespace PFE_PROJECT.Controllers
 
         // PUT: api/Unite/5
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<IActionResult> UpdateUnite(int id, UpdateUniteDTO dto)
         {
             var updated = await _uniteService.UpdateUniteAsync(id, dto);
@@ -62,7 +62,7 @@ namespace PFE_PROJECT.Controllers
 
         // DELETE: api/Unite/5
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<IActionResult> DeleteUnite(int id)
         {
             if (!await _uniteService.CanDeleteUniteAsync(id))
@@ -71,10 +71,16 @@ namespace PFE_PROJECT.Controllers
             var result = await _uniteService.DeleteUniteAsync(id);
             return result ? NoContent() : NotFound();
         }
-
+        [HttpGet("canDelete/{id}")]
+         // [Authorize(Roles = "Admin Métier,Admin IT")]
+        public async Task<ActionResult<bool>> CanDelete(int id)
+        {
+            var canDelete = await _uniteService.CanDeleteUniteAsync(id);
+            return Ok(canDelete);
+        }
         // GET: api/Unite/wilayas
         [HttpGet("wilayas")]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<ActionResult<IEnumerable<Wilaya>>> GetWilayas()
         {
             return Ok(await _uniteService.GetAllWilayasAsync());
@@ -82,11 +88,17 @@ namespace PFE_PROJECT.Controllers
 
         // GET: api/Unite/regions
         [HttpGet("regions")]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<ActionResult<IEnumerable<Region>>> GetRegions()
         {
             return Ok(await _uniteService.GetAllRegionsAsync());
         }
+        [HttpGet("count")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
+        public async Task<ActionResult<int>> GetUniteCount()
+        {
+             return await _uniteService.GetUniteCountAsync();
+        }
+
     }
 }
-

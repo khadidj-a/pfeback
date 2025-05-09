@@ -21,7 +21,7 @@ namespace PFE_PROJECT.Controllers
 
         // Lecture : autorisée pour Admin IT et Admin Métier
         [HttpGet]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<ActionResult<IEnumerable<CategorieDTO>>> GetCategories(
             [FromQuery] string? searchTerm = null,
             [FromQuery] string? sortBy = null,
@@ -33,7 +33,7 @@ namespace PFE_PROJECT.Controllers
 
         // Lecture d’un élément précis
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<ActionResult<CategorieDTO>> GetCategorie(int id)
         {
             var categorie = await _categorieService.GetCategorieByIdAsync(id);
@@ -43,7 +43,7 @@ namespace PFE_PROJECT.Controllers
 
         // Création : seulement Admin Métier
         [HttpPost]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+      //  [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<ActionResult<CategorieDTO>> CreateCategorie(CreateCategorieDTO categorieDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -54,7 +54,7 @@ namespace PFE_PROJECT.Controllers
 
         // Modification : seulement Admin Métier
         [HttpPut("{id}")]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+     //   [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<IActionResult> UpdateCategorie(int id, UpdateCategorieDTO categorieDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
@@ -67,7 +67,7 @@ namespace PFE_PROJECT.Controllers
 
         // Suppression : seulement Admin Métier
         [HttpDelete("{id}")]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<IActionResult> DeleteCategorie(int id)
         {
             if (!await _categorieService.CanDeleteCategorieAsync(id))

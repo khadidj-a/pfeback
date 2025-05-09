@@ -8,7 +8,8 @@ namespace PFE_PROJECT.Models
         [Key]
         public int idunite { get; set; }
 
-        [DatabaseGenerated(DatabaseGeneratedOption.Computed)]
+        [Required]
+        [StringLength(255)]
         public string? codeunite { get; set; }
 
         [Required]
