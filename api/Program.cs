@@ -11,14 +11,14 @@ using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ➕ Contrôleurs + options JSON pour éviter les cycles
+// ➕ Controllers with JSON loop handling
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
     });
 
-// ➕ Swagger avec support JWT
+// ➕ Swagger + JWT
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -54,7 +54,7 @@ builder.Services.AddSwaggerGen(options =>
     });
 });
 
-// ➕ DbContext SQL Server avec retry (plus robuste)
+// ➕ DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
         sqlOptions => sqlOptions.EnableRetryOnFailure()));
@@ -72,21 +72,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidIssuer = builder.Configuration["Jwt:Issuer"],
             ValidAudience = builder.Configuration["Jwt:Audience"],
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"])),
-            RoleClaimType = ClaimTypes.Role // pour [Authorize(Roles = "xxx")]
+            RoleClaimType = ClaimTypes.Role
         };
     });
 
-// ➕ CORS : autoriser toutes les origines (ajuste si besoin)
+// ✅ CORS - updated to allow requests from Angular frontend
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll",
-        builder =>
-        {
-            builder.SetIsOriginAllowed(origin => true) // Allow any origin
-                   .AllowAnyMethod()
-                   .AllowAnyHeader()
-                   .AllowCredentials();
-        });
+    options.AddPolicy("AllowAngular", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:4200",   // Angular CLI default
+                "http://localhost:49296",  // Your custom dev port
+             "http://localhost:52831" // Your browser’s temporary dev port
+            )
+            .AllowAnyMethod()
+            .AllowAnyHeader()
+            .AllowCredentials(); // Needed if using cookies or Authorization header
+    });
 });
 
 // ➕ Repositories & Services - Utilisateur / Rôles
@@ -96,6 +99,8 @@ builder.Services.AddScoped<IUtilisateurService, UtilisateurService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
+
+builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
 // ➕ Services supplémentaires - Équipements
 builder.Services.AddScoped<IMarqueService, MarqueService>();
 builder.Services.AddScoped<ITypeEquipService, TypeEquipService>();
@@ -113,10 +118,12 @@ builder.Services.AddScoped<IOrganeEquipementService, OrganeEquipementService>();
 builder.Services.AddScoped<IGroupeOrganeService, GroupeOrganeService>();
 builder.Services.AddScoped<IGroupeCaracteristiqueService, GroupeCaracteristiqueService>();
 builder.Services.AddScoped<IAffectationService, AffectationService>();
+builder.Services.AddScoped<IOrganeCaracteristiqueService, OrganeCaracteristiqueService>();
+
 
 var app = builder.Build();
 
-// ➤ Pipeline de traitement HTTP
+// ➤ Middleware order is important
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -126,14 +133,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+// ✅ CORS must come before auth
+app.UseCors("AllowAngular");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 app.MapGet("/", () => "✅ API Gestion Utilisateurs + Équipements opérationnelle !");
-
 app.Run();
-

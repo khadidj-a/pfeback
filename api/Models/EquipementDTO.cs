@@ -1,3 +1,6 @@
+using System;
+using System.Text.Json.Serialization;
+
 namespace PFE_PROJECT.Models
 {
     public class EquipementDTO
@@ -13,7 +16,9 @@ namespace PFE_PROJECT.Models
         public string design { get; set; } = string.Empty;
         public int? idGrpIdq { get; set; }
         public string? groupeIdentiqueDesignation { get; set; }
-        public string? état { get; set; }
+        public string? etat { get; set; }
+        public string numserie { get; set; } = "INCONNU";
+        public string position_physique { get; set; } = "INCONNU";
         public DateTime? DateMiseService { get; set; }
         public int? AnnéeFabrication { get; set; }
         public DateTime? DateAcquisition { get; set; }
@@ -29,7 +34,9 @@ namespace PFE_PROJECT.Models
         public int idMarq { get; set; }
         public string design { get; set; } = string.Empty;
         public int? idGrpIdq { get; set; }
-        public string? état { get; set; }
+        public string? etat { get; set; }
+        public string numserie { get; set; } = "INCONNU";
+        public string position_physique { get; set; } = "INCONNU";
         public DateTime? DateMiseService { get; set; }
         public int? AnnéeFabrication { get; set; }
         public DateTime? DateAcquisition { get; set; }
@@ -44,7 +51,9 @@ namespace PFE_PROJECT.Models
         public int idMarq { get; set; }
         public string design { get; set; } = string.Empty;
         public int? idGrpIdq { get; set; }
-        public string? état { get; set; }
+        public string? etat { get; set; }
+        public string numserie { get; set; } = "INCONNU";
+        public string position_physique { get; set; } = "INCONNU";
         public DateTime? DateMiseService { get; set; }
         public int? AnnéeFabrication { get; set; }
         public DateTime? DateAcquisition { get; set; }
@@ -55,10 +64,12 @@ namespace PFE_PROJECT.Models
     public class EquipementFilterDTO
     {
         public int? idCat { get; set; }
-        public string? état { get; set; }
+        public string? etat { get; set; }
         public int? idMarq { get; set; }
         public int? idType { get; set; }
         public int? idGrpIdq { get; set; }
+        public string? numserie { get; set; }
+        public string? position_physique { get; set; }
         public DateTime? DateMiseService { get; set; }
         public int? AnnéeFabrication { get; set; }
         public DateTime? DateAcquisition { get; set; }

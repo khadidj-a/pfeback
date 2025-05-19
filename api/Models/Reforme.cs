@@ -9,14 +9,16 @@ namespace PFE_PROJECT.Models
         [Key]
         public int idref { get; set; }
 
-        [ForeignKey("Equipement")]
-        public int ideqpt { get; set; }
+       [ForeignKey("Equipement")]
+public int ideqpt { get; set; }
+
+public Equipement? Equipement { get; set; }
 
         public string motifref { get; set; } = string.Empty;
 
         public DateTime dateref { get; set; }
 
-        public string numdes { get; set; } = string.Empty;
+        public int numdes { get; set; } 
     }
 }
 

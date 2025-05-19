@@ -53,29 +53,33 @@ public class GroupeIdentiqueService : IGroupeIdentiqueService
         }).ToListAsync();
     }
 
-    public async Task<GroupeIdentiqueDTO?> GetByIdAsync(int id)
-    {
-        var g = await _context.GroupeIdentiques
-            .Include(g => g.Marque)
-            .Include(g => g.TypeEquip)
-            .Include(g => g.GroupeOrganes)
-                .ThenInclude(go => go.Organe)
-            .Include(g => g.GroupeCaracteristiques)
-                .ThenInclude(gc => gc.Caracteristique)
-            .FirstOrDefaultAsync(g => g.Id == id);
+   public async Task<GroupeIdentiqueDTO?> GetByIdAsync(int id)
+{
+    var g = await _context.GroupeIdentiques
+        .Include(g => g.Marque)
+        .Include(g => g.TypeEquip)
+        .Include(g => g.GroupeOrganes).ThenInclude(go => go.Organe)
+        .Include(g => g.GroupeCaracteristiques).ThenInclude(gc => gc.Caracteristique)
+        .FirstOrDefaultAsync(g => g.Id == id);
 
-        if (g == null) return null;
+    if (g == null) return null;
+return new GroupeIdentiqueDTO
+{
+    Id = g.Id,
+    CodeGrp = g.codegrp,
+    MarqueNom = g.Marque.nom_fabriquant,
+    TypeEquipNom = g.TypeEquip.designation,
+    IdMarque = g.id_marque,
+    IdType = g.id_type_equip,
 
-        return new GroupeIdentiqueDTO
-        {
-            Id = g.Id,
-            CodeGrp = g.codegrp,
-            MarqueNom = g.Marque.nom_fabriquant,
-            TypeEquipNom = g.TypeEquip.designation,
-            Organes = g.GroupeOrganes.Select(o => o.Organe.libelle_organe).ToList(),
-            Caracteristiques = g.GroupeCaracteristiques.Select(c => c.Caracteristique.libelle).ToList()
-        };
-    }
+    Organes = g.GroupeOrganes.Select(o => o.Organe.libelle_organe).ToList(),
+    OrganesIds = g.GroupeOrganes.Select(o => o.Organe.id_organe).ToList(), // 👈
+    Caracteristiques = g.GroupeCaracteristiques.Select(c => c.Caracteristique.libelle).ToList(),
+    CaracteristiquesIds = g.GroupeCaracteristiques.Select(c => c.Caracteristique.id_caracteristique).ToList() // 👈
+};
+
+}
+
 
     public async Task<GroupeIdentiqueDTO> CreateAsync(CreateGroupeIdentiqueDTO dto)
     {
@@ -178,4 +182,28 @@ public class GroupeIdentiqueService : IGroupeIdentiqueService
 {
     return await _context.GroupeIdentiques.CountAsync();
 }
+
+ public async Task<IEnumerable<GroupeIdentiqueDTO>> GetByTypeAndMarqueAsync(int typeId, int marqueId)
+    {
+        return await _context.GroupeIdentiques
+            .Include(g => g.Marque)
+            .Include(g => g.TypeEquip)
+            .Include(g => g.GroupeOrganes).ThenInclude(go => go.Organe)
+            .Include(g => g.GroupeCaracteristiques).ThenInclude(gc => gc.Caracteristique)
+            .Where(g => g.id_type_equip == typeId && g.id_marque == marqueId)
+            .Select(g => new GroupeIdentiqueDTO
+            {
+                Id = g.Id,
+                CodeGrp = g.codegrp,
+                MarqueNom = g.Marque.nom_fabriquant,
+                TypeEquipNom = g.TypeEquip.designation,
+                IdMarque = g.id_marque,
+                IdType = g.id_type_equip,
+                Organes = g.GroupeOrganes.Select(o => o.Organe.libelle_organe).ToList(),
+                OrganesIds = g.GroupeOrganes.Select(o => o.Organe.id_organe).ToList(),
+                Caracteristiques = g.GroupeCaracteristiques.Select(c => c.Caracteristique.libelle).ToList(),
+                CaracteristiquesIds = g.GroupeCaracteristiques.Select(c => c.Caracteristique.id_caracteristique).ToList()
+            })
+            .ToListAsync();
+    }
 }

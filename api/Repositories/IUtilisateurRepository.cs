@@ -13,6 +13,9 @@ namespace PFE_PROJECT.Repositories
         // Task DeleteAsync(int id);
         Task<Utilisateur?> ActivateDeactivateAsync(int id, bool activate);
         Task<Utilisateur> GetByEmailAsync(string email);
+        Task<int> GetUtilisateurCountAsync();
+
+
 
     }
 }

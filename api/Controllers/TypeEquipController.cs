@@ -61,17 +61,24 @@ namespace PFE_PROJECT.Controllers
 
             return Ok(updatedTypeEquip);
         }
-
+  [HttpGet("canDelete/{id}")]
+         // [Authorize(Roles = "Admin Métier,Admin IT")]
+        public async Task<ActionResult<bool>> CanDelete(int id)
+        {
+            var canDelete = await _typeEquipService. CanDeleteTypeEquipAsync(id);
+            return Ok(canDelete);
+        }
+   
         // DELETE: api/TypeEquip/5
         [HttpDelete("{id}")]
       //  [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<IActionResult> DeleteTypeEquip(int id)
         {
-            var result = await _typeEquipService.DeleteTypeEquipAsync(id);
+            var result = await _typeEquipService.CanDeleteTypeEquipAsync(id);
             if (!result)
                 return BadRequest("Ce type d’équipement est utilisé et ne peut pas être supprimé.");
-
-            return NoContent();
+            var resultt = await _typeEquipService.DeleteTypeEquipAsync(id);
+            return resultt ? NoContent() : NotFound();
         }
          [HttpGet("count")]
        // [Authorize(Roles = "Admin Métier,Admin IT")]

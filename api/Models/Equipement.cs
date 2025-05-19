@@ -1,6 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace PFE_PROJECT.Models
 {
@@ -11,15 +12,15 @@ namespace PFE_PROJECT.Models
 
         public int idType { get; set; }
         [ForeignKey("idType")]
-        public TypeEquip TypeEquip { get; set; } = null!;
+        public TypeEquip? TypeEquip { get; set; }
 
         public int idCat { get; set; }
         [ForeignKey("idCat")]
-        public Categorie Categorie { get; set; } = null!;
+        public Categorie? Categorie { get; set; }
 
         public int idMarq { get; set; }
         [ForeignKey("idMarq")]
-        public Marque Marque { get; set; } = null!;
+        public Marque? Marque { get; set; }
 
         [Required]
         [StringLength(50)]
@@ -34,10 +35,23 @@ namespace PFE_PROJECT.Models
         public GroupeIdentique? GroupeIdentique { get; set; }
 
         [StringLength(50)]
-        public string? état { get; set; }
+        [RegularExpression("^(operationnel|En panne|pre_reforme|reforme)$", 
+            ErrorMessage = "L'état doit être l'un des suivants: operationnel, En panne, pre_reforme, reforme")]
+        public string? etat { get; set; }
+
+        [Required]
+        [StringLength(100)]
+        public string numserie { get; set; } = "INCONNU";
+
+        [Required]
+        [StringLength(255)]
+        public string position_physique { get; set; } = "INCONNU";
 
         public DateTime? DateMiseService { get; set; }
+
+        [JsonPropertyName("anneeFabrication")]
         public int? AnnéeFabrication { get; set; }
+        
         public DateTime? DateAcquisition { get; set; }
 
         [Column(TypeName = "decimal(10,2)")]
@@ -48,5 +62,4 @@ namespace PFE_PROJECT.Models
         public Unite? Unite { get; set; }
     }
 }
-
 

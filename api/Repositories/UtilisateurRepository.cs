@@ -85,6 +85,12 @@ public async Task<Utilisateur> GetByEmailAsync(string email)
         .Include(u => u.Role)
         .FirstOrDefaultAsync(u => u.email == email);
 }
+public async Task<int> GetUtilisateurCountAsync()
+{
+    return await _context.Utilisateurs.CountAsync();
+}
+
+
 
 }
 

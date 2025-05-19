@@ -16,7 +16,7 @@ namespace PFE_PROJECT.DTOs
         public required string Prenom { get; set; }
         
         [StringLength(20)]
-        public string? NumTel { get; set; } // Nullable si ce n'est pas une donnée obligatoire
+        public required string NumTel { get; set; } // Nullable si ce n'est pas une donnée obligatoire
         
         [Required]
         [EmailAddress]

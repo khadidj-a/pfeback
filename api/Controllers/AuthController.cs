@@ -14,7 +14,9 @@ namespace PFE_PROJECT.Controllers
         private readonly IUtilisateurService _utilisateurService;
         private readonly IJwtService _jwtService;
 
-        public AuthController(IUtilisateurService utilisateurService, IJwtService jwtService)
+        public AuthController(
+            IUtilisateurService utilisateurService, 
+            IJwtService jwtService)
         {
             _utilisateurService = utilisateurService;
             _jwtService = jwtService;
@@ -26,7 +28,7 @@ namespace PFE_PROJECT.Controllers
         {
             var user = await _utilisateurService.GetByEmailAsync(loginDto.Email);
 
-            if (user == null || user.motpasse != loginDto.motpasse)
+            if (user == null || !_utilisateurService.VerifyPassword(user.motpasse, loginDto.motpasse))
                 return Unauthorized("❌ Email ou mot de passe incorrect.");
 
             if (user.Actif == "0")
@@ -34,7 +36,6 @@ namespace PFE_PROJECT.Controllers
 
             var roleName = await _utilisateurService.GetRoleNameByIdAsync(user.idrole);
 
-            // ✅ Vérifier que le rôle est autorisé
             if (roleName != "Admin IT" && roleName != "Admin Métier" && roleName != "Responsable Unité")
                 return Forbid("⛔ Accès refusé : rôle non autorisé.");
 

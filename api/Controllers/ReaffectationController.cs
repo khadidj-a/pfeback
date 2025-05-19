@@ -1,8 +1,11 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using PFE_PROJECT.Models;
 using PFE_PROJECT.Services;
-using PFE_PROJECT.Helpers; // pour RoleHelper
-using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using PFE_PROJECT.Data;
+
 
 namespace PFE_PROJECT.Controllers
 {
@@ -11,15 +14,17 @@ namespace PFE_PROJECT.Controllers
     public class ReaffectationController : ControllerBase
     {
         private readonly IReaffectationService _service;
+        private readonly ApplicationDbContext _context;
 
-        public ReaffectationController(IReaffectationService service)
+        public ReaffectationController(IReaffectationService service, ApplicationDbContext context)
         {
             _service = service;
+            _context = context;
         }
 
         // GET: api/Reaffectation
         [HttpGet]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+        //[Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<IActionResult> GetAll([FromQuery] string? search = null, [FromQuery] string? sortBy = null, [FromQuery] string? order = "asc")
         {
             var list = await _service.GetAllAsync(search, sortBy, order);
@@ -28,7 +33,7 @@ namespace PFE_PROJECT.Controllers
 
         // POST: api/Reaffectation
         [HttpPost]
-        [Authorize(Roles = "Admin Métier")]
+        //[Authorize(Roles = "Admin Métier")]
         public async Task<IActionResult> Create(CreateReaffectationDTO dto)
         {
             try
@@ -46,28 +51,68 @@ namespace PFE_PROJECT.Controllers
             }
         }
 
-        // GET: api/Reaffectation/5
+        // GET: api/Reaffectation/{id}
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+        //[Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _service.GetByIdAsync(id);
             return result == null ? NotFound() : Ok(result);
         }
 
-        // GET: api/Reaffectation/unite
-[HttpGet("unite")]
-[Authorize(Roles = "Responsable Unité")]
-public async Task<IActionResult> GetByUnite([FromQuery] string? search = null, [FromQuery] string? sortBy = null, [FromQuery] string? order = "asc")
+  // GET: api/Reaffectation/byunite?idunite=1&search=...&sortBy=...&order=asc
+[HttpGet("byunite")]
+public async Task<ActionResult<IEnumerable<ReaffectationDTO>>> GetReaffectationsByUnite(
+    [FromQuery] int idunite,
+    [FromQuery] string? search = null,
+    [FromQuery] string? sortBy = null,
+    [FromQuery] string order = "asc")
 {
-    // 🔐 Récupérer l'id de l'unité depuis les claims utilisateur
-    var idUniteClaim = User.Claims.FirstOrDefault(c => c.Type == "idunite")?.Value;
+    var reaffectations = await _service.GetByUniteAsync(idunite, search, sortBy, order);
+    return Ok(reaffectations);
+}
 
-    if (string.IsNullOrEmpty(idUniteClaim) || !int.TryParse(idUniteClaim, out int idUnite))
-        return Unauthorized("Unité non reconnue pour cet utilisateur.");
 
-    var result = await _service.GetByUniteAsync(idUnite, search, sortBy, order);
-    return Ok(result);
+        // GET: api/Reaffectation/count
+        [HttpGet("count")]
+        //[Authorize(Roles = "Admin Métier,Admin IT")]
+        public async Task<ActionResult<int>> GetReaffectationCount()
+        {
+            return await _service.GetReaffectationCountAsync();
+        }
+
+        // GET: api/Reaffectation/equipement/{id}/etat
+        [HttpGet("equipement/{id}/etat")]
+        public async Task<IActionResult> GetEtatEquipement(int id)
+        {
+            var etat = await _service.GetEtatEquipementAsync(id);
+            return etat == null ? NotFound("Équipement introuvable") : Ok(etat);
+        }
+
+        // GET: api/Reaffectation/equipements/{id}/unite
+        [HttpGet("equipements/{id}/unite")]
+        public IActionResult GetUniteByEquipementId(int id)
+        {
+           var equipement = _context.Equipements.Include(e => e.Unite).FirstOrDefault(e => e.idEqpt == id);
+if (equipement == null || equipement.idunite == null)
+    return NotFound();
+
+var unite = _context.Unites
+    .Where(u => u.idunite == equipement.idunite)
+    .Select(u => new { idunite = u.idunite, designation = u.designation })
+    .FirstOrDefault();
+
+
+            return Ok(unite);
+        }
+        [HttpGet("count/unite/{idUnite}")]
+public async Task<int> GetreaffCountByUnite(int idUnite)
+{
+    
+    return await _context.Reaffectations
+       
+        .Where(r => r.iduniteemt == idUnite )
+        .CountAsync();
 }
 
     }

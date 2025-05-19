@@ -84,5 +84,12 @@ namespace PFE_PROJECT.Controllers
         {
              return await _categorieService.GetCategorieCountAsync();
         }
+          [HttpGet("canDelete/{id}")]
+         // [Authorize(Roles = "Admin Métier,Admin IT")]
+        public async Task<ActionResult<bool>> CanDelete(int id)
+        {
+            var canDelete = await _categorieService. CanDeleteCategorieAsync(id);
+            return Ok(canDelete);
+        }
     }
 }

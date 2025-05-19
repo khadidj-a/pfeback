@@ -1,5 +1,7 @@
-using System.ComponentModel.DataAnnotations;
 
+
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 namespace PFE_PROJECT.Models
 {
     public class OrganeEquipementDTO

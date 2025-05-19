@@ -12,15 +12,19 @@ namespace PFE_PROJECT.Controllers
     public class UtilisateurController : ControllerBase
     {
         private readonly IUtilisateurService _utilisateurService;
+        private readonly IPasswordHasher _passwordHasher;
 
-        public UtilisateurController(IUtilisateurService utilisateurService)
+        public UtilisateurController(
+            IUtilisateurService utilisateurService,
+            IPasswordHasher passwordHasher)
         {
             _utilisateurService = utilisateurService;
+            _passwordHasher = passwordHasher;
         }
 
         // Only Admin IT should be able to create users
         [HttpPost]
-        [Authorize(Roles = "Admin IT")]  // Only Admin IT can perform this action
+      //  [Authorize(Roles = "Admin IT")]  // Only Admin IT can perform this action
         public async Task<IActionResult> Create([FromBody] CreateUtilisateurDto dto)
         {
             if (dto == null)
@@ -38,7 +42,7 @@ namespace PFE_PROJECT.Controllers
                     prenom = dto.Prenom,
                     numtel = dto.NumTel,
                     email = dto.Email,
-                    motpasse = dto.MotPasse,
+                    motpasse = dto.MotPasse, // Password will be hashed in the service
                     idrole = dto.IdRole,
                     Actif = "1" // Default value for "actif"
                 };
@@ -53,74 +57,61 @@ namespace PFE_PROJECT.Controllers
         }
 
         // Only Admin IT should be able to update users
-[HttpPut("{id}")]
-[Authorize(Roles = "Admin IT")]
-public async Task<IActionResult> Update(int id, [FromBody] UpdateUtilisateurDto dto)
-{
-    if (dto == null)
-    {
-        return BadRequest("Invalid user data.");
-    }
-
-    try
-    {
-        // D'abord, récupérer l'utilisateur existant
-        var existingUser = await _utilisateurService.GetByIdAsync(id);
-        if (existingUser == null)
+        [HttpPut("{id}")]
+      //  [Authorize(Roles = "Admin IT")]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateUtilisateurDto dto)
         {
-            return NotFound($"Utilisateur avec ID {id} non trouvé.");
+            if (dto == null)
+            {
+                return BadRequest("Invalid user data.");
+            }
+
+            try
+            {
+                // D'abord, récupérer l'utilisateur existant
+                var existingUser = await _utilisateurService.GetByIdAsync(id);
+                if (existingUser == null)
+                {
+                    return NotFound($"Utilisateur avec ID {id} non trouvé.");
+                }
+
+                // Mettre à jour uniquement les champs fournis
+                if (dto.IdUnite.HasValue)
+                    existingUser.idunite = dto.IdUnite.Value;
+                
+                if (!string.IsNullOrEmpty(dto.Nom))
+                    existingUser.nom = dto.Nom;
+                    
+                if (!string.IsNullOrEmpty(dto.Prenom))
+                    existingUser.prenom = dto.Prenom;
+                    
+                if (!string.IsNullOrEmpty(dto.NumTel))
+                    existingUser.numtel = dto.NumTel;
+                    
+                if (!string.IsNullOrEmpty(dto.Email))
+                    existingUser.email = dto.Email;
+                    
+                if (!string.IsNullOrEmpty(dto.MotPasse))
+                    existingUser.motpasse = dto.MotPasse; // Password will be hashed in the service
+                    
+                if (dto.IdRole.HasValue)
+                    existingUser.idrole = dto.IdRole.Value;
+
+                // Appeler le service pour mettre à jour l'utilisateur
+                var updatedUser = await _utilisateurService.UpdateAsync(existingUser);
+                return Ok(updatedUser);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
-        // Mettre à jour uniquement les champs fournis
-        if (dto.IdUnite.HasValue)
-            existingUser.idunite = dto.IdUnite.Value;
         
-        if (!string.IsNullOrEmpty(dto.Nom))
-            existingUser.nom = dto.Nom;
-            
-        if (!string.IsNullOrEmpty(dto.Prenom))
-            existingUser.prenom = dto.Prenom;
-            
-        if (!string.IsNullOrEmpty(dto.NumTel))
-            existingUser.numtel = dto.NumTel;
-            
-        if (!string.IsNullOrEmpty(dto.Email))
-            existingUser.email = dto.Email;
-            
-        if (!string.IsNullOrEmpty(dto.MotPasse))
-            existingUser.motpasse = dto.MotPasse;
-            
-        if (dto.IdRole.HasValue)
-            existingUser.idrole = dto.IdRole.Value;
-
-        // Appeler le service pour mettre à jour l'utilisateur
-        var updatedUser = await _utilisateurService.UpdateAsync(existingUser);
-        return Ok(updatedUser);
-    }
-    catch (InvalidOperationException ex)
-    {
-        return BadRequest(ex.Message);
-    }
-}
-        // Only Admin IT should be able to delete users
-        // [HttpDelete("{id}")]
-        // [Authorize(Roles = "Admin IT")]
-        // public async Task<IActionResult> Delete(int id)
-        // {
-        //     try
-        //     {
-        //         await _utilisateurService.DeleteAsync(id);
-        //         return NoContent();
-        //     }
-        //     catch (InvalidOperationException ex)
-        //     {
-        //         return BadRequest(ex.Message);
-        //     }
-        // }
 
         // Public endpoint to get user details (can be open or restricted)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin IT, User")]  // Either Admin IT or a regular User can view their own data
+      //  [Authorize(Roles = "Admin IT, User")]  // Either Admin IT or a regular User can view their own data
         public async Task<IActionResult> GetById(int id)
         {
             var utilisateur = await _utilisateurService.GetByIdAsync(id);
@@ -135,7 +126,7 @@ public async Task<IActionResult> Update(int id, [FromBody] UpdateUtilisateurDto 
 
         // Only Admin IT can view all users
         [HttpGet]
-        [Authorize(Roles = "Admin IT")]
+      //  [Authorize(Roles = "Admin IT")]
         public async Task<IActionResult> GetAll()
         {
             var utilisateurs = await _utilisateurService.GetAllAsync();
@@ -144,7 +135,7 @@ public async Task<IActionResult> Update(int id, [FromBody] UpdateUtilisateurDto 
 
         // Only Admin IT can activate/deactivate users
         [HttpPatch("{id}/activate")]
-        [Authorize(Roles = "Admin IT")]
+        // [Authorize(Roles = "Admin IT")]
         public async Task<IActionResult> Activate(int id)
         {
             try
@@ -164,7 +155,7 @@ public async Task<IActionResult> Update(int id, [FromBody] UpdateUtilisateurDto 
 
         // Only Admin IT can activate/deactivate users
         [HttpPatch("{id}/deactivate")]
-        [Authorize(Roles = "Admin IT")]
+       // [Authorize(Roles = "Admin IT")]
         public async Task<IActionResult> Deactivate(int id)
         {
             try
@@ -181,6 +172,16 @@ public async Task<IActionResult> Update(int id, [FromBody] UpdateUtilisateurDto 
                 return BadRequest(ex.Message);
             }
         }
+        [HttpGet("exists")]
+
+[AllowAnonymous] // 🔓 This allows unauthenticated requests to access this endpoint
+public async Task<IActionResult> CheckEmailExists([FromQuery] string email)
+{
+    var utilisateurs = await _utilisateurService.GetAllAsync();
+    bool exists = utilisateurs.Any(u => u.email.ToLower() == email.ToLower());
+    return Ok(exists);
+}
+
 
         // Search endpoint by nom, prenom, or email
         [HttpGet("search")]
@@ -213,6 +214,11 @@ public async Task<IActionResult> Update(int id, [FromBody] UpdateUtilisateurDto 
 
             return NotFound("No users found matching the search criteria.");
         }
-        
+        [HttpGet("count")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
+        public async Task<ActionResult<int>> GetutilisateurCount()
+        {
+             return await _utilisateurService.GetUtilisateurCountAsync();
+        }
     }
-}
+}  

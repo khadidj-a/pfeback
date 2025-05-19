@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+   using Microsoft.EntityFrameworkCore;
 using PFE_PROJECT.Data;
 using PFE_PROJECT.Models;
 
@@ -73,26 +73,58 @@ namespace PFE_PROJECT.Services
             return await GetByEquipementIdAsync(dto.ideqpt);
         }
 
-        public async Task<IEnumerable<CaracteristiqueEquipementDTO>> BulkCreateAsync(BulkCreateCaracteristiqueEquipementDTO dto)
-        {
-            var caracteristiqueEquipements = dto.Caracteristiques.Select(c => new CaracteristiqueEquipement
+      public async Task<IEnumerable<CaracteristiqueEquipementDTO>> BulkCreateAsync(BulkCreateCaracteristiqueEquipementDTO dto)
+{
+    // Récupère les idcarac déjà existants pour cet équipement
+    var existingCaracs = await _context.CaracteristiqueEquipements
+        .Where(ce => ce.ideqpt == dto.ideqpt)
+        .Select(ce => ce.idcarac)
+        .ToListAsync();
+
+    // Filtre les nouvelles caractéristiques à ajouter
+    var newCaracteristiques = dto.Caracteristiques
+        .Where(c => !existingCaracs.Contains(c.idcarac))
+        .ToList();
+
+    // Crée les entités à insérer
+    var caracteristiqueEquipements = newCaracteristiques.Select(c => new CaracteristiqueEquipement
+    {
+        ideqpt = dto.ideqpt,
+        idcarac = c.idcarac,
+        valeur = c.valeur
+    }).ToList();
+
+    _context.CaracteristiqueEquipements.AddRange(caracteristiqueEquipements);
+    await _context.SaveChangesAsync();
+
+    // Ajout dans GroupeCaracteristique si l'équipement a un groupe
+    var equipement = await _context.Equipements
+        .FirstOrDefaultAsync(e => e.idEqpt == dto.ideqpt);
+
+    if (equipement != null && equipement.idGrpIdq != null)
+    {
+        var existingGroupeCaracs = await _context.GroupeCaracteristiques
+            .Where(gc => gc.idgrpidq == equipement.idGrpIdq)
+            .Select(gc => gc.idcarac)
+            .ToListAsync();
+
+        var newGroupeCaracs = newCaracteristiques
+            .Where(c => !existingGroupeCaracs.Contains(c.idcarac))
+            .Select(c => new GroupeCaracteristique
             {
-                ideqpt = dto.ideqpt,
-                idcarac = c.idcarac,
-                valeur = c.valeur
+                idgrpidq = equipement.idGrpIdq.Value,
+                idcarac = c.idcarac
             }).ToList();
 
-            _context.CaracteristiqueEquipements.AddRange(caracteristiqueEquipements);
-            await _context.SaveChangesAsync();
+        _context.GroupeCaracteristiques.AddRange(newGroupeCaracs);
+        await _context.SaveChangesAsync();
+    }
 
-            return caracteristiqueEquipements.Select(ce => new CaracteristiqueEquipementDTO
-            {
-                ideqpt = ce.ideqpt,
-                idcarac = ce.idcarac,
-                valeur = ce.valeur,
-                nomcarac = ce.Caracteristique!.libelle
-            });
-        }
+    // Retourner les caractéristiques complètes avec les noms
+    return await GetByEquipementIdAsync(dto.ideqpt);
+}
+
+
 
         public async Task<CaracteristiqueEquipementDTO?> UpdateAsync(int ideqpt, int idcarac, UpdateCaracteristiqueEquipementDTO dto)
         {
@@ -116,3 +148,4 @@ namespace PFE_PROJECT.Services
         }
     }
 } 
+

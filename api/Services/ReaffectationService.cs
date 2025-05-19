@@ -12,52 +12,73 @@ namespace PFE_PROJECT.Services
         {
             _context = context;
         }
+public async Task<IEnumerable<ReaffectationDTO>> GetAllAsync(string? search = null, string? sortBy = null, string? order = "asc")
+{
+    var query = _context.Reaffectations
+        .Include(r => r.Equipement)
+        .Include(r => r.UniteEmission)
+        .Include(r => r.UniteDestination)
+        .AsQueryable();
 
-        public async Task<IEnumerable<ReaffectationDTO>> GetAllAsync(string? search = null, string? sortBy = null, string? order = "asc")
+    // 🔍 Recherche enrichie
+    if (!string.IsNullOrEmpty(search))
+    {
+        query = query.Where(r =>
+            r.motifreaf.Contains(search) ||
+            r.Equipement.design.Contains(search) ||
+            r.Equipement.codeEqp.Contains(search) ||
+            r.UniteEmission.designation.Contains(search) ||
+            r.UniteDestination.designation.Contains(search)
+        );
+    }
+
+    // 🔃 Tri enrichi
+    if (!string.IsNullOrEmpty(sortBy))
+    {
+        switch (sortBy.ToLower())
         {
-            var query = _context.Reaffectations.AsQueryable();
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                query = query.Where(r =>
-                    r.motifreaf.Contains(search));
-            }
-
-            if (!string.IsNullOrEmpty(sortBy))
-            {
-                switch (sortBy.ToLower())
-                {
-                    case "date":
-                        query = order == "desc" ? query.OrderByDescending(r => r.datereaf) : query.OrderBy(r => r.datereaf);
-                        break;
-                    case "motif":
-                        query = order == "desc" ? query.OrderByDescending(r => r.motifreaf) : query.OrderBy(r => r.motifreaf);
-                        break;
-                    case "equipement":
-                    case "ideqpt":
-                        query = order == "desc" ? query.OrderByDescending(r => r.ideqpt) : query.OrderBy(r => r.ideqpt);
-                        break;
-                }
-            }
-
-            return await query.Select(r => new ReaffectationDTO
-            {
-                idreaf = r.idreaf,
-                ideqpt = r.ideqpt,
-                iduniteemt = r.iduniteemt,
-                idunitedest = r.idunitedest,
-                datereaf = r.datereaf,
-                motifreaf = r.motifreaf
-            }).ToListAsync();
+            case "date":
+                query = order == "desc" ? query.OrderByDescending(r => r.datereaf) : query.OrderBy(r => r.datereaf);
+                break;
+            case "motif":
+                query = order == "desc" ? query.OrderByDescending(r => r.motifreaf) : query.OrderBy(r => r.motifreaf);
+                break;
+            case "equipement":
+            case "designation":
+                query = order == "desc" ? query.OrderByDescending(r => r.Equipement.design) : query.OrderBy(r => r.Equipement.design);
+                break;
+            case "code":
+                query = order == "desc" ? query.OrderByDescending(r => r.Equipement.codeEqp) : query.OrderBy(r => r.Equipement.codeEqp);
+                break;
+            case "ancienneunite":
+                query = order == "desc" ? query.OrderByDescending(r => r.UniteEmission.designation) : query.OrderBy(r => r.UniteEmission.designation);
+                break;
+            case "nouvelleunite":
+                query = order == "desc" ? query.OrderByDescending(r => r.UniteDestination.designation) : query.OrderBy(r => r.UniteDestination.designation);
+                break;
         }
+    }
+
+    return await query.Select(r => new ReaffectationDTO
+    {
+        idreaf = r.idreaf,
+        ideqpt = r.ideqpt,
+        iduniteemt = r.iduniteemt,
+        idunitedest = r.idunitedest,
+        datereaf = r.datereaf,
+        motifreaf = r.motifreaf
+    }).ToListAsync();
+}
+
+
 public async Task<ReaffectationDTO> CreateAsync(CreateReaffectationDTO dto)
 {
     var equipement = await _context.Equipements.FindAsync(dto.idEquipement);
     if (equipement == null)
         throw new Exception("Équipement introuvable");
 
-    if (equipement.état == "Réformé" || equipement.état == "Prêt")
-        throw new Exception($"L’équipement est en état '{equipement.état}' et ne peut pas être réaffecté.");
+    if (equipement.etat == "reforme" )
+        throw new Exception($"L’équipement est en état '{equipement.etat}' et ne peut pas être réaffecté.");
 
     // 🔸 On garde en mémoire l’unité actuelle AVANT la modification
    int idUniteEmettrice = equipement.idunite.GetValueOrDefault();
@@ -105,21 +126,28 @@ public async Task<ReaffectationDTO?> GetByIdAsync(int id)
         datereaf = r.datereaf,
         motifreaf = r.motifreaf
     };
-}
-public async Task<IEnumerable<ReaffectationDTO>> GetByUniteAsync(int idUnite, string? search = null, string? sortBy = null, string? order = "asc")
+}public async Task<IEnumerable<ReaffectationDTO>> GetByUniteAsync(int idUnite, string? search = null, string? sortBy = null, string? order = "asc")
 {
     var query = _context.Reaffectations
-        .Where(r => r.iduniteemt == idUnite || r.idunitedest == idUnite)
+        .Include(r => r.Equipement)
+        .Include(r => r.UniteEmission)
+        .Include(r => r.UniteDestination)
+        .Where(r => r.iduniteemt == idUnite )
         .AsQueryable();
 
-    // 🔍 Recherche
+    // 🔍 Recherche enrichie
     if (!string.IsNullOrEmpty(search))
     {
         query = query.Where(r =>
-            r.motifreaf.Contains(search));
+            r.motifreaf.Contains(search) ||
+            r.Equipement.design.Contains(search) ||
+            r.Equipement.codeEqp.Contains(search) ||
+            r.UniteEmission.designation.Contains(search) ||
+            r.UniteDestination.designation.Contains(search)
+        );
     }
 
-    // 🔃 Tri
+    // 🔃 Tri enrichi
     if (!string.IsNullOrEmpty(sortBy))
     {
         switch (sortBy.ToLower())
@@ -131,8 +159,17 @@ public async Task<IEnumerable<ReaffectationDTO>> GetByUniteAsync(int idUnite, st
                 query = order == "desc" ? query.OrderByDescending(r => r.motifreaf) : query.OrderBy(r => r.motifreaf);
                 break;
             case "equipement":
-            case "ideqpt":
-                query = order == "desc" ? query.OrderByDescending(r => r.ideqpt) : query.OrderBy(r => r.ideqpt);
+            case "designation":
+                query = order == "desc" ? query.OrderByDescending(r => r.Equipement.design) : query.OrderBy(r => r.Equipement.design);
+                break;
+            case "code":
+                query = order == "desc" ? query.OrderByDescending(r => r.Equipement.codeEqp) : query.OrderBy(r => r.Equipement.codeEqp);
+                break;
+            case "ancienneunite":
+                query = order == "desc" ? query.OrderByDescending(r => r.UniteEmission.designation) : query.OrderBy(r => r.UniteEmission.designation);
+                break;
+            case "nouvelleunite":
+                query = order == "desc" ? query.OrderByDescending(r => r.UniteDestination.designation) : query.OrderBy(r => r.UniteDestination.designation);
                 break;
         }
     }
@@ -148,6 +185,19 @@ public async Task<IEnumerable<ReaffectationDTO>> GetByUniteAsync(int idUnite, st
     }).ToListAsync();
 }
 
+   public async Task<int> GetReaffectationCountAsync()
+    {
+      return await _context.Reaffectations.CountAsync();
+    }
+            public async Task<string?> GetEtatEquipementAsync(int idEquipement)
+{
+    var equipement = await _context.Equipements
+                                   .Where(e => e.idEqpt == idEquipement)
+                                   .Select(e => e.etat)
+                                   .FirstOrDefaultAsync();
+
+    return equipement; // Retourne null si non trouvé
+}
 
     }
 }

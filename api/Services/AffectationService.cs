@@ -25,7 +25,9 @@ namespace PFE_PROJECT.Services
                 string lowerSearch = searchTerm.ToLower();
                 query = query.Where(a =>
                     a.Equipement.design.ToLower().Contains(lowerSearch) ||
-                    a.Unite.designation.ToLower().Contains(lowerSearch));
+                    a.Unite.designation.ToLower().Contains(lowerSearch) ||
+                    a.num_decision_affectation.ToLower().Contains(lowerSearch) ||
+                    a.num_ordre.ToLower().Contains(lowerSearch));
             }
 
             sortBy ??= "dateaffec";
@@ -33,6 +35,8 @@ namespace PFE_PROJECT.Services
             {
                 "equipement" => ascending ? query.OrderBy(a => a.Equipement.design) : query.OrderByDescending(a => a.Equipement.design),
                 "unite" => ascending ? query.OrderBy(a => a.Unite.designation) : query.OrderByDescending(a => a.Unite.designation),
+                "decision" => ascending ? query.OrderBy(a => a.num_decision_affectation) : query.OrderByDescending(a => a.num_decision_affectation),
+                "ordre" => ascending ? query.OrderBy(a => a.num_ordre) : query.OrderByDescending(a => a.num_ordre),
                 _ => ascending ? query.OrderBy(a => a.dateaffec) : query.OrderByDescending(a => a.dateaffec)
             };
 
@@ -42,6 +46,8 @@ namespace PFE_PROJECT.Services
                 ideqpt = a.ideqpt,
                 idunite = a.idunite,
                 dateaffec = a.dateaffec,
+                num_decision_affectation = a.num_decision_affectation,
+                num_ordre = a.num_ordre,
                 designationEquipement = a.Equipement.design,
                 designationUnite = a.Unite.designation
             }).ToListAsync();
@@ -64,7 +70,9 @@ namespace PFE_PROJECT.Services
             {
                 ideqpt = dto.ideqpt,
                 idunite = dto.idunite,
-                dateaffec = dto.dateaffec
+                dateaffec = dto.dateaffec,
+                num_decision_affectation = dto.num_decision_affectation,
+                num_ordre = dto.num_ordre
             };
 
             _context.Affectations.Add(affectation);
@@ -81,6 +89,8 @@ namespace PFE_PROJECT.Services
                 ideqpt = affectation.ideqpt,
                 idunite = affectation.idunite,
                 dateaffec = affectation.dateaffec,
+                num_decision_affectation = affectation.num_decision_affectation,
+                num_ordre = affectation.num_ordre,
                 designationEquipement = equipement.design,
                 designationUnite = unite.designation
             };
@@ -101,6 +111,8 @@ namespace PFE_PROJECT.Services
                 ideqpt = affectation.ideqpt,
                 idunite = affectation.idunite,
                 dateaffec = affectation.dateaffec,
+                num_decision_affectation = affectation.num_decision_affectation,
+                num_ordre = affectation.num_ordre,
                 designationEquipement = affectation.Equipement.design,
                 designationUnite = affectation.Unite.designation
             };

@@ -8,7 +8,7 @@ namespace PFE_PROJECT.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [EnableCors("AllowAll")]
+    [EnableCors("AllowAngularDev")]
     public class AffectationController : ControllerBase
     {
         private readonly IAffectationService _service;
@@ -18,8 +18,15 @@ namespace PFE_PROJECT.Controllers
             _service = service;
         }
 
+        // Explicit OPTIONS endpoint
+        [HttpOptions]
+        public IActionResult PreflightRoute()
+        {
+            return Ok();
+        }
+
         [HttpGet]
-       // [Authorize(Roles = "Admin Métier,Admin IT")]
+        //[Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<ActionResult<IEnumerable<AffectationDTO>>> GetAll(
             [FromQuery] string? searchTerm = null,
             [FromQuery] string? sortBy = null,
@@ -67,7 +74,7 @@ namespace PFE_PROJECT.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Erreur lors de la création de l'affectation", error = ex.Message });
+                return StatusCode(500, new { message = "Erreur lors de la création de l'affectation", error = ex.Message });
             }
         }
     }

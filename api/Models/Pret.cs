@@ -12,18 +12,20 @@ namespace PFE_PROJECT.Models
 
         [ForeignKey("Equipement")]
         public int ideqpt { get; set; }
+        public Equipement? Equipement { get; set; }
 
-        [ForeignKey("Unite")]
+        [ForeignKey("UniteDestination")]
         public int idunite { get; set; } // Unité à laquelle on prête
+        public Unite? UniteDestination { get; set; }
+
+        [ForeignKey("UniteEmettrice")]
+        public int? iduniteemt { get; set; } // Unité émettrice
+        public Unite? UniteEmettrice { get; set; }
 
         public int duree { get; set; }
 
         public DateTime datepret { get; set; }
+        public string? motif { get; set; } // nouveau champ
 
-        public int? iduniteemt { get; set; } // Unité émettrice
-
-        public Equipement? Equipement { get; set; }
     }
 }
-
-

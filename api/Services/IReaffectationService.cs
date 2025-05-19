@@ -7,7 +7,9 @@ namespace PFE_PROJECT.Services
         Task<ReaffectationDTO> CreateAsync(CreateReaffectationDTO dto);
         Task<ReaffectationDTO?> GetByIdAsync(int id);
         Task<IEnumerable<ReaffectationDTO>> GetByUniteAsync(int idUnite, string? search = null, string? sortBy = null, string? order = "asc");
+Task<int> GetReaffectationCountAsync();
 
+        Task<string?> GetEtatEquipementAsync(int idEquipement);
 
     }
 }

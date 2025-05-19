@@ -31,7 +31,7 @@ namespace PFE_PROJECT.Controllers
 
         // Consultation par ID (tous)
         [HttpGet("{id}")]
-        [Authorize(Roles = "Admin Métier,Admin IT")]
+       // [Authorize(Roles = "Admin Métier,Admin IT")]
         public async Task<IActionResult> GetById(int id)
         {
             var result = await _service.GetByIdAsync(id);
@@ -84,7 +84,14 @@ namespace PFE_PROJECT.Controllers
             var canDelete = await _service.CanDeleteGroupeAsync(id);
             return Ok(canDelete);
         }
-        
+          [HttpGet("byTypeAndMarque")]
+        public async Task<ActionResult<IEnumerable<GroupeIdentiqueDTO>>> GetByTypeAndMarque(
+            [FromQuery] int typeId,
+            [FromQuery] int marqueId)
+        {
+            var result = await _service.GetByTypeAndMarqueAsync(typeId, marqueId);
+            return Ok(result);
+        }
 
         
     }

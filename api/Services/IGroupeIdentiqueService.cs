@@ -13,6 +13,7 @@ public interface IGroupeIdentiqueService
     Task<bool> DeleteAsync(int id);
     Task<bool> CanDeleteGroupeAsync(int id);
     Task<int> GetGroupeCountAsync();
+    Task<IEnumerable<GroupeIdentiqueDTO>> GetByTypeAndMarqueAsync(int typeId, int marqueId);
 
 }
 
