@@ -88,5 +88,26 @@ namespace PFE_PROJECT.Services
 
             return await GetByEquipementIdAsync(dto.ideqpt);
         }
+
+        public async Task<OrganeEquipementDTO?> UpdateAsync(int ideqpt, int idorg, UpdateOrganeEquipementDTO dto)
+        {
+            var organeEquipement = await _context.OrganeEquipements
+                .Include(oe => oe.Organe)
+                .FirstOrDefaultAsync(oe => oe.ideqpt == ideqpt && oe.idorg == idorg);
+
+            if (organeEquipement == null)
+                return null;
+
+            organeEquipement.numsérie = dto.numsérie;
+            await _context.SaveChangesAsync();
+
+            return new OrganeEquipementDTO
+            {
+                idorg = organeEquipement.idorg,
+                ideqpt = organeEquipement.ideqpt,
+                numsérie = organeEquipement.numsérie,
+                nomOrgane = organeEquipement.Organe?.libelle_organe
+            };
+        }
     }
 } 

@@ -30,6 +30,9 @@ namespace PFE_PROJECT.Models
         [StringLength(255)]
         public string design { get; set; } = string.Empty;
 
+        [StringLength(500)]
+        public string? observation { get; set; }
+
         public int? idGrpIdq { get; set; }
         [ForeignKey("idGrpIdq")]
         public GroupeIdentique? GroupeIdentique { get; set; }
@@ -62,4 +65,5 @@ namespace PFE_PROJECT.Models
         public Unite? Unite { get; set; }
     }
 }
+
 

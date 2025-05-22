@@ -35,5 +35,14 @@ namespace PFE_PROJECT.Controllers
             var organes = await _service.CreateAsync(dto);
             return CreatedAtAction(nameof(GetByEquipementId), new { ideqpt = dto.ideqpt }, organes);
         }
+
+        [HttpPut("equipement/{ideqpt}/organe/{idorg}")]
+        public async Task<ActionResult<OrganeEquipementDTO>> Update(int ideqpt, int idorg, UpdateOrganeEquipementDTO dto)
+        {
+            var organe = await _service.UpdateAsync(ideqpt, idorg, dto);
+            if (organe == null)
+                return NotFound();
+            return Ok(organe);
+        }
     }
 } 

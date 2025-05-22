@@ -1,5 +1,3 @@
-
-
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 namespace PFE_PROJECT.Models
@@ -29,5 +27,12 @@ namespace PFE_PROJECT.Models
         [Required]
         [StringLength(100)]
         public string numsérie { get; set; } = string.Empty;
+    }
+
+    public class UpdateOrganeEquipementDTO
+    {
+        [Required]
+        [StringLength(100)]
+        public string? numsérie { get; set; }
     }
 } 
