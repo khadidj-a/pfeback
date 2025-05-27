@@ -76,19 +76,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-// ✅ CORS - updated to allow requests from Angular frontend
+// ➕ CORS : autoriser les origines spécifiques
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAngular", policy =>
+    options.AddPolicy("AllowAngularDev", policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:4200",   // Angular CLI default
-                "http://localhost:49296",  // Your custom dev port
-             "http://localhost:52831" // Your browser’s temporary dev port
-            )
-            .AllowAnyMethod()
-            .AllowAnyHeader()
-            .AllowCredentials(); // Needed if using cookies or Authorization header
+        policy.WithOrigins("http://localhost:4200")
+              .AllowAnyHeader()
+              .WithMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+              .AllowCredentials()
+              .WithExposedHeaders("Content-Disposition");
     });
 });
 
@@ -124,6 +121,9 @@ builder.Services.AddScoped<IOrganeCaracteristiqueService, OrganeCaracteristiqueS
 var app = builder.Build();
 
 // ➤ Middleware order is important
+// Important: CORS must be one of the first middleware components
+app.UseCors("AllowAngularDev");
+
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -131,11 +131,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Authentication and Authorization after CORS
 app.UseHttpsRedirection();
-
-// ✅ CORS must come before auth
-app.UseCors("AllowAngular");
-
 app.UseAuthentication();
 app.UseAuthorization();
 

@@ -49,4 +49,39 @@ namespace PFE_PROJECT.Models
         [StringLength(255)]
         public string valeur { get; set; } = string.Empty;
     }
+
+    public class AddCaracteristiqueEquipementDTO
+    {
+        [Required]
+        public int ideqpt { get; set; }
+        
+        [Required]
+        public int idcarac { get; set; }
+        
+        [Required]
+        [StringLength(255)]
+        public string valeur { get; set; } = string.Empty;
+    }
+
+    public class DeleteCaracteristiqueEquipementDTO
+    {
+        [Required]
+        public int ideqpt { get; set; }
+        
+        [Required]
+        public int idcarac { get; set; }
+    }
+
+    public class ModifyCaracteristiqueEquipementDTO
+    {
+        [Required]
+        public int ideqpt { get; set; }
+        
+        [Required]
+        public int idcarac { get; set; }
+        
+        [Required]
+        [StringLength(255)]
+        public string valeur { get; set; } = string.Empty;
+    }
 } 

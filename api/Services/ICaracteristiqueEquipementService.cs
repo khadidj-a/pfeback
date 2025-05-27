@@ -11,5 +11,10 @@ namespace PFE_PROJECT.Services
         Task<IEnumerable<CaracteristiqueEquipementDTO>> CreateAsync(BulkCreateCaracteristiqueEquipementDTO dto);
         Task<IEnumerable<CaracteristiqueEquipementDTO>> BulkCreateAsync(BulkCreateCaracteristiqueEquipementDTO dto);
         Task<CaracteristiqueEquipementDTO?> UpdateAsync(int ideqpt, int idcarac, UpdateCaracteristiqueEquipementDTO dto);
+        
+        // New methods
+        Task<CaracteristiqueEquipementDTO?> AddCaracteristiqueAsync(AddCaracteristiqueEquipementDTO dto);
+        Task<bool> DeleteCaracteristiqueAsync(DeleteCaracteristiqueEquipementDTO dto);
+        Task<CaracteristiqueEquipementDTO?> ModifyCaracteristiqueAsync(ModifyCaracteristiqueEquipementDTO dto);
     }
 } 

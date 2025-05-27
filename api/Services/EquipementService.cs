@@ -1,5 +1,3 @@
-
-
 using Microsoft.EntityFrameworkCore;
 using PFE_PROJECT.Data;
 using PFE_PROJECT.Models;
@@ -250,44 +248,30 @@ namespace PFE_PROJECT.Services
             if (marque == null)
                 throw new ArgumentException("Marque invalide");
 
-            // Find or create GroupeIdentique
-            int? idGrpIdq = null;
-            if (dto.idGrpIdq == null)
-            {
-                // Look for existing group with same Marque and TypeEquip
-                var existingGroup = await _context.GroupeIdentiques
-                    .FirstOrDefaultAsync(g => g.id_marque == dto.idMarq && g.id_type_equip == dto.idType);
+            // Find or create GroupeIdentique based on Marque and TypeEquip
+            var existingGroup = await _context.GroupeIdentiques
+                .FirstOrDefaultAsync(g => g.id_marque == dto.idMarq && g.id_type_equip == dto.idType);
 
-                if (existingGroup != null)
-                {
-                    idGrpIdq = existingGroup.Id;
-                }
-                else
-                {
-                    // Create new group
-                    var newGroup = new GroupeIdentique
-                    {
-                        id_marque = dto.idMarq,
-                        id_type_equip = dto.idType,
-                        codegrp = $"{marque.codemarque}{dto.idType}"
-                    };
-                    _context.GroupeIdentiques.Add(newGroup);
-                    await _context.SaveChangesAsync();
-                    idGrpIdq = newGroup.Id;
-                }
+            int? idGrpIdq;
+            if (existingGroup != null)
+            {
+                // Use existing group
+                idGrpIdq = existingGroup.Id;
+                Console.WriteLine($"Using existing GroupeIdentique: {existingGroup.codegrp}");
             }
             else
             {
-                // Use provided group if it exists
-                var providedGroup = await _context.GroupeIdentiques.FindAsync(dto.idGrpIdq);
-                if (providedGroup == null)
-                    throw new ArgumentException("GroupeIdentique invalide");
-                
-                // Verify that the provided group matches the Marque and TypeEquip
-                if (providedGroup.id_marque != dto.idMarq || providedGroup.id_type_equip != dto.idType)
-                    throw new ArgumentException("Le GroupeIdentique fourni ne correspond pas à la Marque et au TypeEquip");
-                
-                idGrpIdq = dto.idGrpIdq;
+                // Create new group
+                var newGroup = new GroupeIdentique
+                {
+                    id_marque = dto.idMarq,
+                    id_type_equip = dto.idType,
+                    codegrp = $"{marque.codemarque}{dto.idType}"
+                };
+                _context.GroupeIdentiques.Add(newGroup);
+                await _context.SaveChangesAsync();
+                idGrpIdq = newGroup.Id;
+                Console.WriteLine($"Created new GroupeIdentique: {newGroup.codegrp}");
             }
 
             var equipement = new Equipement
@@ -304,7 +288,8 @@ namespace PFE_PROJECT.Services
                 AnnéeFabrication = dto.AnnéeFabrication,
                 DateAcquisition = dto.DateAcquisition,
                 ValeurAcquisition = dto.ValeurAcquisition,
-                idunite = dto.idunite
+                idunite = dto.idunite,
+                idGrpIdq = idGrpIdq // Set the GroupeIdentique ID
             };
 
             _context.Equipements.Add(equipement);

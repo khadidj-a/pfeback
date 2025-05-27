@@ -44,5 +44,32 @@ namespace PFE_PROJECT.Controllers
                 return NotFound();
             return Ok(organe);
         }
+
+        [HttpPost("add")]
+        public async Task<ActionResult<OrganeEquipementDTO>> AddOrgane(AddOrganeEquipementDTO dto)
+        {
+            var result = await _service.AddOrganeAsync(dto);
+            if (result == null)
+                return BadRequest("Failed to add organe");
+            return Ok(result);
+        }
+
+        [HttpDelete("delete")]
+        public async Task<ActionResult> DeleteOrgane(DeleteOrganeEquipementDTO dto)
+        {
+            var success = await _service.DeleteOrganeAsync(dto);
+            if (!success)
+                return NotFound();
+            return Ok();
+        }
+
+        [HttpPut("modify")]
+        public async Task<ActionResult<OrganeEquipementDTO>> ModifyOrgane(ModifyOrganeEquipementDTO dto)
+        {
+            var result = await _service.ModifyOrganeAsync(dto);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
     }
 } 

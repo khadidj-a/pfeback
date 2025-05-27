@@ -109,5 +109,62 @@ namespace PFE_PROJECT.Services
                 nomOrgane = organeEquipement.Organe?.libelle_organe
             };
         }
+
+        public async Task<OrganeEquipementDTO?> AddOrganeAsync(AddOrganeEquipementDTO dto)
+        {
+            // Check if the organe already exists
+            var existing = await _context.OrganeEquipements
+                .FirstOrDefaultAsync(oe => oe.ideqpt == dto.ideqpt && oe.idorg == dto.idorg);
+
+            if (existing != null)
+                return null;
+
+            var organeEquipement = new OrganeEquipement
+            {
+                ideqpt = dto.ideqpt,
+                idorg = dto.idorg,
+                numsérie = dto.numsérie
+            };
+
+            _context.OrganeEquipements.Add(organeEquipement);
+            await _context.SaveChangesAsync();
+
+            return await GetByEquipementIdAsync(dto.ideqpt)
+                .ContinueWith(t => t.Result.FirstOrDefault(o => o.idorg == dto.idorg));
+        }
+
+        public async Task<bool> DeleteOrganeAsync(DeleteOrganeEquipementDTO dto)
+        {
+            var organeEquipement = await _context.OrganeEquipements
+                .FirstOrDefaultAsync(oe => oe.ideqpt == dto.ideqpt && oe.idorg == dto.idorg);
+
+            if (organeEquipement == null)
+                return false;
+
+            _context.OrganeEquipements.Remove(organeEquipement);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<OrganeEquipementDTO?> ModifyOrganeAsync(ModifyOrganeEquipementDTO dto)
+        {
+            var organeEquipement = await _context.OrganeEquipements
+                .Include(oe => oe.Organe)
+                .FirstOrDefaultAsync(oe => oe.ideqpt == dto.ideqpt && oe.idorg == dto.idorg);
+
+            if (organeEquipement == null)
+                return null;
+
+            organeEquipement.numsérie = dto.numsérie;
+            await _context.SaveChangesAsync();
+
+            return new OrganeEquipementDTO
+            {
+                idorg = organeEquipement.idorg,
+                ideqpt = organeEquipement.ideqpt,
+                numsérie = organeEquipement.numsérie,
+                nomOrgane = organeEquipement.Organe?.libelle_organe ?? string.Empty
+            };
+        }
     }
 } 

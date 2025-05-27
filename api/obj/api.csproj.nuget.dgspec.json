@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\Lenovo\\pfe\\realback\\api\\api.csproj": {}
+    "C:\\Users\\User\\desktop\\pfe1\\pfeback\\api\\api.csproj": {}
   },
   "projects": {
-    "C:\\Users\\Lenovo\\pfe\\realback\\api\\api.csproj": {
+    "C:\\Users\\User\\desktop\\pfe1\\pfeback\\api\\api.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\Lenovo\\pfe\\realback\\api\\api.csproj",
+        "projectUniqueName": "C:\\Users\\User\\desktop\\pfe1\\pfeback\\api\\api.csproj",
         "projectName": "api",
-        "projectPath": "C:\\Users\\Lenovo\\pfe\\realback\\api\\api.csproj",
-        "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\Lenovo\\pfe\\realback\\api\\obj\\",
+        "projectPath": "C:\\Users\\User\\desktop\\pfe1\\pfeback\\api\\api.csproj",
+        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\User\\desktop\\pfe1\\pfeback\\api\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\Lenovo\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],

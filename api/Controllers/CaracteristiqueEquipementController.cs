@@ -51,6 +51,32 @@ namespace PFE_PROJECT.Controllers
                 return NotFound();
             return Ok(caracteristique);
         }
-        
+
+        [HttpPost("add")]
+        public async Task<ActionResult<CaracteristiqueEquipementDTO>> AddCaracteristique(AddCaracteristiqueEquipementDTO dto)
+        {
+            var result = await _service.AddCaracteristiqueAsync(dto);
+            if (result == null)
+                return BadRequest("Failed to add caracteristique");
+            return Ok(result);
+        }
+
+        [HttpDelete("delete")]
+        public async Task<ActionResult> DeleteCaracteristique(DeleteCaracteristiqueEquipementDTO dto)
+        {
+            var success = await _service.DeleteCaracteristiqueAsync(dto);
+            if (!success)
+                return NotFound();
+            return Ok();
+        }
+
+        [HttpPut("modify")]
+        public async Task<ActionResult<CaracteristiqueEquipementDTO>> ModifyCaracteristique(ModifyCaracteristiqueEquipementDTO dto)
+        {
+            var result = await _service.ModifyCaracteristiqueAsync(dto);
+            if (result == null)
+                return NotFound();
+            return Ok(result);
+        }
     }
 } 

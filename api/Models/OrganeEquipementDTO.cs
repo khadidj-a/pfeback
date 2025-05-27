@@ -6,6 +6,7 @@ namespace PFE_PROJECT.Models
     {
         public int idorg { get; set; }
         public int ideqpt { get; set; }
+        [JsonPropertyName("numserie")]
         public string numsérie { get; set; } = string.Empty;
         public string nomOrgane { get; set; } = string.Empty;
     }
@@ -16,23 +17,59 @@ namespace PFE_PROJECT.Models
         public int ideqpt { get; set; }
         
         [Required]
-        public List<OrganeInfoDTO> Organes { get; set; } = new();
+        public List<OrganeValeurDTO> Organes { get; set; } = new();
     }
 
-    public class OrganeInfoDTO
+    public class OrganeValeurDTO
     {
         [Required]
         public int idorg { get; set; }
         
         [Required]
-        [StringLength(100)]
+        [StringLength(255)]
+        [JsonPropertyName("numserie")]
         public string numsérie { get; set; } = string.Empty;
     }
 
     public class UpdateOrganeEquipementDTO
     {
         [Required]
-        [StringLength(100)]
-        public string? numsérie { get; set; }
+        [StringLength(255)]
+        public string numsérie { get; set; } = string.Empty;
+    }
+
+    public class AddOrganeEquipementDTO
+    {
+        [Required]
+        public int ideqpt { get; set; }
+        
+        [Required]
+        public int idorg { get; set; }
+        
+        [Required]
+        [StringLength(255)]
+        public string numsérie { get; set; } = string.Empty;
+    }
+
+    public class DeleteOrganeEquipementDTO
+    {
+        [Required]
+        public int ideqpt { get; set; }
+        
+        [Required]
+        public int idorg { get; set; }
+    }
+
+    public class ModifyOrganeEquipementDTO
+    {
+        [Required]
+        public int ideqpt { get; set; }
+        
+        [Required]
+        public int idorg { get; set; }
+        
+        [Required]
+        [StringLength(255)]
+        public string numsérie { get; set; } = string.Empty;
     }
 } 
